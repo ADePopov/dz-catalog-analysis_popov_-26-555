@@ -38,7 +38,7 @@ def average_rating(movies: list[dict]) -> float:
     mean = round(rating/counts,2)
     return mean
 result_ar = average_rating(movies)
-print(result_ar)
+#print(result_ar)
 
 
 def catalog_age_stats(movies: list[dict], current_year: int = 2026) -> tuple:
@@ -73,7 +73,7 @@ def catalog_age_stats(movies: list[dict], current_year: int = 2026) -> tuple:
 
     return max_year, min_year, avg_year
 result_cas = catalog_age_stats(movies, current_year=2026)
-print(result_cas)
+#print(result_cas)
 
 
 def duration_in_hours(minutes: int) -> str:
@@ -85,7 +85,7 @@ def duration_in_hours(minutes: int) -> str:
     minute = minutes % 60
     return f"{hour}ч {minute}м"
 result_din = duration_in_hours(660)
-print(result_din)
+#print(result_din)
 
 
 def rating_tier(rating: float) -> str:
@@ -101,7 +101,7 @@ def rating_tier(rating: float) -> str:
         return 'средне'
     return 'слабо' if rating < 5 else 'pass'
 result_rt = rating_tier(0.1)
-print(result_rt)
+#print(result_rt)
 
 
 def decade_label(year: int) -> str:
@@ -118,22 +118,12 @@ def decade_label(year: int) -> str:
         case year if year < 2015:
             return 'старые'
 result_dl = decade_label(2230)
-print(result_dl)
+#print(result_dl)
 
-"""
-        Задача
-    Продемонстрируйте работу с for, while и управляющими конструкциями циклов на каталоге.
-    С помощью for и continue выведите на экран (print) названия всех фильмов, которые НЕ относятся к жанру "comedy".
-    С помощью while и break найдите первый по порядку в списке фильм с рейтингом выше 9.0; если такого фильма нет, цикл должен завершиться веткой else с сообщением "Шедевров не найдено".
-Напишите функцию count_long_movies(movies, threshold=120), которая через for с накопительной переменной считает количество фильмов длиннее threshold минут.
-Требования
-Обязательно использовать continue в первом пункте и break — во втором.
-Ветка else цикла while должна быть по-настоящему задействована (проверьте и случай, когда шедевров нет).
-В count_long_movies нельзя использовать sum() по списку-фильтру — только накопление в цикле.
-Подсказка
-"""
+
+# С помощью for и continue выведите на экран (print) названия всех фильмов, которые НЕ относятся к жанру "comedy".
 counts = 0
-for i in movies:
+#for i in movies:
     if 'comedy' not in movies[counts].get('genres',[]):
         print(movies[counts].get('title',[]))
         counts += 1
@@ -141,20 +131,32 @@ for i in movies:
         counts += 1
         continue
 
-counts = 0
-while movies[counts].get('rating') < 7:
-    print(movies[counts].get('rating'))
-    counts += 1
 
+# С помощью while и break найдите первый по порядку в списке фильм с рейтингом выше 9.0; если такого фильма нет, цикл должен завершиться веткой else с сообщением "Шедевров не найдено".
 counts = 0
-rating = []
 while counts < len(movies):
     if movies[counts].get('rating') >= 9:
         print(movies[counts].get('title'))
         break
-    else:
-        print('Шедевров не найдено')
     counts += 1
+else:
+    print('Шедевров не найдено')
+
+def count_long_movies(movies: list[dict], threshold: int = 120) -> int:
+    """
+    Функция count_long_movies(movies, threshold=120), 
+    которая через for с накопительной переменной считает количество фильмов длиннее threshold минут.
+    """
+    counts = 0
+    counts_film = 0
+    for i in movies:
+        if movies[counts].get('duration_min') > threshold:
+            counts_film += 1
+        counts += 1
+    return counts_film
+result_clm = count_long_movies(movies)
+#print(result_clm) 
+
     
     
 
