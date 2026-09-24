@@ -229,7 +229,7 @@ def titles_sorted_by_rating(movies: list) -> list:
     movie_titles = [movie['title'] for movie in sorted_films]
     return movie_titles
 result_tsr = titles_sorted_by_rating(movies)
-print(result_tsr)
+#print(result_tsr)
 
 def top_n_by_rating(movies: list, n: int = 3) -> list(tuple):
     """
@@ -244,4 +244,77 @@ def top_n_by_rating(movies: list, n: int = 3) -> list(tuple):
         counts += 1
     return result_list
 result_tnbr = top_n_by_rating(movies)
-print(result_tnbr)
+#print(result_tnbr)
+
+"""
+Этап 6. Словари
+Задача
+Напишите функцию count_by_genre(movies), возвращающую словарь {жанр: количество фильмов}, построенный вручную через цикл и метод dict.get() (без Counter).
+Напишите функцию actor_filmography(movies), возвращающую словарь {актер: [список названий фильмов]}.
+С помощью генератора словаря (dict comprehension) постройте словарь {title: rating} только для фильмов с рейтингом выше среднего (используйте average_rating из этапа 1).
+Пример результата
+
+count_by_genre(movies)
+# {"drama": 5, "sci-fi": 3, "comedy": 3, "thriller": 3, "action": 2, "mystery": 1} 
+Требования
+count_by_genre не использует collections.Counter.
+Значение по несуществующему ключу получать через dict.get() со значением по умолчанию.
+Словарь {title: rating} обязательно построен генератором словаря, а не циклом с присваиванием.
+Подсказка
+dict.get(key, 0) возвращает 0, если ключа еще нет в словаре, — это избавляет от проверки «если ключ уже есть» перед каждым увеличением счетчика.
+"""
+def count_by_genre(movies: list[dict]) -> list:
+    """
+    Функция count_by_genre(movies), 
+    возвращающает словарь {жанр: количество фильмов}
+    """
+    counts = 0
+    result = []
+    for i in movies:
+        result = list(dict.fromkeys(result + list(movies[counts].get('genres'))))
+        counts += 1
+
+    counts = 0
+    lists = []
+    for i in movies:
+        lists.append(movies[counts].get('genres'))
+        counts += 1
+
+    final = {}
+    for i in result:
+        final[i] = sum(i in s for s in lists)
+    return final
+result_cbg = count_by_genre(movies)
+#print(result_cbg)
+
+def actor_filmography(movies:list) -> dict:
+    """
+    функция actor_filmography(movies), 
+    возвращает словарь {актер: [список названий фильмов]}
+    """
+    counts = {}
+    for movie in movies:
+        title = movie.get('title')
+        for actor in movie.get('actors',[]):
+            if actor not in counts:
+                counts[actor] = []
+            counts[actor].append(title)
+    return counts
+result_af = actor_filmography(movies)
+#print(result_af)
+
+titles = []
+counts = 0
+for i in movies:
+    titles.append(movies[counts].get('title'))
+    counts += 1
+rating = []
+counts = 0
+for i in movies:
+    rating.append(movies[counts].get('rating'))
+    counts += 1
+avg_rate = average_rating(movies)
+title_rating = {title: rate for title, rate in zip(titles, rating) if rate > avg_rate}
+print(title_rating)
+
+    
