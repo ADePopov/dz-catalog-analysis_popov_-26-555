@@ -199,13 +199,21 @@ def make_slug(title: str) -> str:
 result_ms = make_slug("Silent Hours")
 print(result_ms)
 
-def format_report_line(movie):
+def format_report_line(movie: list[dict]) -> str:
+    """
+    функция format_report_line(movie), 
+    возвращает единую строку с описанием фильма.
+    Пример результата
+    format_report_line(movies[7])
+    '"The Quiet Algorithm" (2024) — 9.2/10, 1ч 58м, жанры: drama, sci-fi' 
+    """
     title = movie.get('title')
     year = movie.get('year')
     rating = movie.get('rating')
     duration = duration_in_hours(movie.get('duration_min'))
-    genres = str(movie.get('genres'))
+    genress = movie.get('genres')
+    genres = ', '.join(list(genress))
     f = f'{title} ({year}) — {rating}/10, {duration}, жанры: {genres}'
     return f
-films = format_report_line(movies[1])
+films = format_report_line(movies[2])
 print(films)
