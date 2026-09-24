@@ -157,21 +157,6 @@ def count_long_movies(movies: list[dict], threshold: int = 120) -> int:
 result_clm = count_long_movies(movies)
 #print(result_clm) 
 
-"""
-3.Напишите функцию format_report_line(movie), 
-возвращающую единую строку с описанием фильма.
-Пример результата
-
-format_report_line(movies[7])
-# '"The Quiet Algorithm" (2024) — 9.2/10, 1ч 58м, жанры: drama, sci-fi' 
-Требования
-normalize_title нельзя реализовывать через str.title().
-make_slug использует .lower() и .replace().
-format_report_line обязательно собирается через f-строку и вызывает duration_in_hours из этапа 1.
-Жанры в строке отчета отсортированы по алфавиту.
-Подсказка
-Срез word[1:] — это «все, кроме первого символа»; вместе с word[0].upper() он и дает смену регистра первой буквы вручную.
-"""
 
 def normalize_title(title: str) -> str:
     """
@@ -186,7 +171,7 @@ def normalize_title(title: str) -> str:
     new_string = ' '.join(new_string) 
     return new_string  
 result_nt = normalize_title("silent hours")
-print(result_nt)
+#print(result_nt)
 
 def make_slug(title: str) -> str:
     """
@@ -197,7 +182,7 @@ def make_slug(title: str) -> str:
     result = title.lower().replace(' ', '-')
     return result  
 result_ms = make_slug("Silent Hours")
-print(result_ms)
+#print(result_ms)
 
 def format_report_line(movie: list[dict]) -> str:
     """
@@ -211,9 +196,52 @@ def format_report_line(movie: list[dict]) -> str:
     year = movie.get('year')
     rating = movie.get('rating')
     duration = duration_in_hours(movie.get('duration_min'))
-    genress = movie.get('genres')
-    genres = ', '.join(list(genress))
+    genresss = movie.get('genres')
+    genress = list(genresss)
+    genress.sort()
+    genres = ', '.join(genress)
     f = f'{title} ({year}) — {rating}/10, {duration}, жанры: {genres}'
     return f
 films = format_report_line(movies[2])
-print(films)
+#print(films)
+
+"""
+Напишите функцию top_n_by_rating(movies, n=3), возвращающую список из n кортежей (title, rating) — топ по рейтингу.
+Пример результата
+
+ребования
+Каждая запись в top_n_by_rating — именно tuple, а не список.
+titles_sorted_by_rating не должна изменять исходный список movies.
+Подсказка
+key принимает функцию, которая возвращает значение для сравнения элементов; для сортировки по убыванию пригодится параметр reverse=True.
+
+top_n_by_rating(movies, 3)
+# [("The Quiet Algorithm", 9.2), ("midnight in oslo", 8.9), ("The Dune Chronicles", 8.6)] 
+"""
+
+def titles_sorted_by_rating(movies: list) -> list:
+    """
+    Функция titles_sorted_by_rating(movies), 
+    возвращающую список названий фильмов, 
+    отсортированных по убыванию рейтинга.
+    """
+    sorted_films = sorted(movies, key=lambda movies: movies.get('rating'), reverse = True)
+    movie_titles = [movie['title'] for movie in sorted_films]
+    return movie_titles
+result_tsr = titles_sorted_by_rating(movies)
+print(result_tsr)
+
+def top_n_by_rating(movies: list, n: int = 3) -> list(tuple):
+    """
+    Функция top_n_by_rating(movies, n=3), 
+    возвращающая список из n кортежей (title, rating) — топ по рейтингу.
+    """
+    sorted_films = sorted(movies, key=lambda movies: movies.get('rating'), reverse = True)
+    counts = 0
+    result_list = []
+    while counts < n:
+        result_list.append((sorted_films[counts].get('title'), sorted_films[counts].get('rating')))
+        counts += 1
+    return result_list
+result_tnbr = top_n_by_rating(movies)
+print(result_tnbr)
