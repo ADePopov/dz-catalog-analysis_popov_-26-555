@@ -123,7 +123,7 @@ result_dl = decade_label(2230)
 
 # С помощью for и continue выведите на экран (print) названия всех фильмов, которые НЕ относятся к жанру "comedy".
 counts = 0
-#for i in movies:
+for i in movies:
     if 'comedy' not in movies[counts].get('genres',[]):
         print(movies[counts].get('title',[]))
         counts += 1
@@ -157,7 +157,55 @@ def count_long_movies(movies: list[dict], threshold: int = 120) -> int:
 result_clm = count_long_movies(movies)
 #print(result_clm) 
 
-    
-    
+"""
+3.Напишите функцию format_report_line(movie), 
+возвращающую единую строку с описанием фильма.
+Пример результата
 
-    
+format_report_line(movies[7])
+# '"The Quiet Algorithm" (2024) — 9.2/10, 1ч 58м, жанры: drama, sci-fi' 
+Требования
+normalize_title нельзя реализовывать через str.title().
+make_slug использует .lower() и .replace().
+format_report_line обязательно собирается через f-строку и вызывает duration_in_hours из этапа 1.
+Жанры в строке отчета отсортированы по алфавиту.
+Подсказка
+Срез word[1:] — это «все, кроме первого символа»; вместе с word[0].upper() он и дает смену регистра первой буквы вручную.
+"""
+
+def normalize_title(title: str) -> str:
+    """
+    функция normalize_title(title), 
+    приводит строку к формату Title Case 
+    (каждое слово с заглавной буквы)   
+    """
+    string = title.split()
+    new_string = []
+    for i in string:
+        new_string.append(i[0:1].upper()+i[1:])
+    new_string = ' '.join(new_string) 
+    return new_string  
+result_nt = normalize_title("silent hours")
+print(result_nt)
+
+def make_slug(title: str) -> str:
+    """
+    функция make_slug(title), превращает 
+    нормализованное название 
+    в «слаг» вида the-quiet-algorithm 
+    """
+    result = title.lower().replace(' ', '-')
+    return result  
+result_ms = make_slug("Silent Hours")
+print(result_ms)
+
+def format_report_line(movie):
+    title = movie.get('title')
+    year = movie.get('year')
+    rating = movie.get('rating')
+    duration = duration_in_hours(movie.get('duration_min'))
+    genres = str(movie.get('genres'))
+    f = f'{title} ({year}) — {rating}/10, {duration}, жанры: {genres}'
+    return f
+films = format_report_line(movies[1])
+print(films)
