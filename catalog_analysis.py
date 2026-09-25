@@ -242,7 +242,7 @@ def count_by_genre(movies: list) -> list:
     final = {}
     for i in result:
         final[i] = sum(i in s for s in lists)
-    return final
+    return dict(sorted(final.items(), key=lambda x: -x[1]))
 
 
 
@@ -347,62 +347,41 @@ for movie in iter_high_rated(movies):
 total = sum(m["duration_min"] for m in movies if m["rating"] > 7)
 print(total)
 
-"""
-Этап 9. Итоговый отчет
-Собираем все вместе.
-Задача
-Напишите функцию build_report(movies), которая объединяет результаты всех предыдущих этапов в единый консольный отчет: общую статистику, топ-3 фильма, количество фильмов по каждому жанру и полный список уникальных жанров каталога.
-Пример отчета
 
-ОТЧеТ ПО КАТАЛОГУ
-Средний рейтинг: 7.2
-Средний возраст фильмов: 8 лет
-
-Топ-3 фильма:
-  "The Quiet Algorithm" (2024) — 9.2/10, 1ч 58м, жанры: drama, sci-fi
-  "Midnight In Oslo" (2020) — 8.9/10, 2ч 4м, жанры: mystery, thriller
-  "The Dune Chronicles" (2021) — 8.6/10, 2ч 35м, жанры: drama, sci-fi
-
-Фильмов по жанрам:
-  drama — 5
-  comedy — 3
-  sci-fi — 3
-  thriller — 3
-  action — 2
-  mystery — 1
-
-Все жанры каталога: action, comedy, drama, mystery, sci-fi, thriller 
-Требования
-build_report — единственная точка входа: один ее вызов полностью воспроизводит отчет.
-Жанры в списке количества отсортированы по убыванию числа фильмов.
-Полный список жанров выводится одной строкой через ", ".join(...).
-"""
 def build_report(movies):
+    line = []
+
     avg_rating = average_rating(movies)
     avg_age = catalog_age_stats(movies)
-    top = sorted(movies, key=lambda m: m.get('rating', 0), reverse=True)[:3]
-    top_lines = "\n".join("  " + format_report_line(m) for m in top)
-    return f'''
-    ОТЧЕТ ПО КАТАЛОГУ
-    Средний рейтинг: {avg_rating}
-    Средний возраст фильмов: {avg_age[2]} лет
 
-    Топ-3 фильма:
-    {top_lines} 
+    line.append("ОТЧЕТ ПО КАТАЛОГУ")
+    line.append(f"Средний рейтинг: {avg_rating}")
+    line.append(f"Средний возраст фильмов: {avg_age[2]} лет")
+    line.append("")
 
-    {count_by_genre(movies)}
-    Фильмов по жанрам:
-    drama — 5
-    comedy — 3
-    sci-fi — 3
-    thriller — 3
-    action — 2
-    mystery — 1
+    line.append("Топ-3 фильма:")
+    top = top_n_by_rating(movies)
+    for title, rating in top:
+        for movie in movies:
+            if movie.get('title') == title:
+                line.append("  " + format_report_line(movie))
+                break
+    line.append("")
 
-    Все жанры каталога: action, comedy, drama, mystery, sci-fi, thriller 
-    '''
-result_final = build_report(movies)
-print(result_final)
+    line.append("Фильмов по жанрам:")
+    genre_c = count_by_genre(movies)
+    for genre, c in genre_c.items():
+        line.append(f"  {genre} — {c}")
+    line.append("")
+
+    k = all_genres(movies)
+    line.append(f"Все жанры каталога: {', '.join(sorted(k))}")
+
+    return "\n".join(line)
+
+if __name__ == "__main__":
+    print(build_report(movies))
+
 
 
 
