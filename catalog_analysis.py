@@ -1,4 +1,5 @@
 import math
+from collections.abc import Iterator
 
 movies = [
     {"title": "The Dune Chronicles", "year": 2021, "genres": {"sci-fi", "drama"},
@@ -32,10 +33,10 @@ def average_rating(movies: list[dict]) -> float:
     """
     counts = 0
     rating = 0
-    for i in movies:
-        rating += movies[counts].get('rating')
+    for movie in movies:
+        rating += movie.get('rating')
         counts += 1
-    mean = round(rating/counts,2)
+    mean = round(rating/counts,1)
     return mean
 
 
@@ -49,11 +50,9 @@ def catalog_age_stats(movies: list[dict], current_year: int = 2026) -> tuple:
     min_year = 0
     max_year = current_year
     avg_year = 0
-    counts = 0
     year_movies = []
-    for i in movies:
-        year_movies.append(movies[counts].get('year'))
-        counts += 1
+    for movie in movies:
+        year_movies.append(movie.get('year'))
 
     #нахождение фильма с минимальной давностью выхода
     for i in year_movies:
@@ -67,7 +66,8 @@ def catalog_age_stats(movies: list[dict], current_year: int = 2026) -> tuple:
 
     min_year = current_year - min_year
     max_year = current_year - max_year
-    avg_year = math.ceil(max_year/min_year)
+    ages = [current_year - movie["year"] for movie in movies]
+    avg_year = math.ceil(sum(ages) / len(ages))
 
     return max_year, min_year, avg_year
 
@@ -90,9 +90,9 @@ def rating_tier(rating: float) -> str:
     """
     if rating >= 9:
         return 'шедевр'
-    elif rating >=7 and rating <= 8.9:
+    elif rating >= 7 and rating < 9:
         return 'хорошо'
-    elif rating >=5 and rating <= 6.9:
+    elif rating >= 5 and rating < 7:
         return 'средне'
     return 'слабо' if rating < 5 else 'pass'
 
@@ -105,48 +105,25 @@ def decade_label(year: int) -> str:
     "новые" (после 2020), "недавние" (2015–2020) или "старые" (раньше 2015).
     """
     match year:
-        case year if year > 2020: 
+        case _ if year > 2020: 
             return 'новые'
-        case year if year <= 2020 and year >= 2015:
+        case _ if 2015 <= year <= 2020:
             return 'недавние'
-        case year if year < 2015:
+        case _ if year < 2015:
             return 'старые'
 
-
-
-# С помощью for и continue выведите на экран (print) названия всех фильмов, которые НЕ относятся к жанру "comedy".
-counts = 0
-for i in movies:
-    if 'comedy' not in movies[counts].get('genres',[]):
-        print(movies[counts].get('title',[]))
-        counts += 1
-    else:
-        counts += 1
-        continue
-
-
-# С помощью while и break найдите первый по порядку в списке фильм с рейтингом выше 9.0; если такого фильма нет, цикл должен завершиться веткой else с сообщением "Шедевров не найдено".
-counts = 0
-while counts < len(movies):
-    if movies[counts].get('rating') >= 9:
-        print(movies[counts].get('title'))
-        break
-    counts += 1
-else:
-    print('Шедевров не найдено')
 
 def count_long_movies(movies: list[dict], threshold: int = 120) -> int:
     """
     Функция count_long_movies(movies, threshold=120), 
     которая через for с накопительной переменной считает количество фильмов длиннее threshold минут.
     """
-    counts = 0
     counts_film = 0
-    for i in movies:
-        if movies[counts].get('duration_min') > threshold:
+    for movie in movies:
+        if movie.get('duration_min') > threshold:
             counts_film += 1
-        counts += 1
     return counts_film
+
 
 
 
@@ -174,7 +151,7 @@ def make_slug(title: str) -> str:
     return result  
 
 
-def format_report_line(movie: list[dict]) -> str:
+def format_report_line(movie: dict) -> str:
     """
     функция format_report_line(movie), 
     возвращает единую строку с описанием фильма.
@@ -196,18 +173,18 @@ def format_report_line(movie: list[dict]) -> str:
 
 
 
-def titles_sorted_by_rating(movies: list) -> list:
+def titles_sorted_by_rating(movies: list[dict]) -> list:
     """
     Функция titles_sorted_by_rating(movies), 
     возвращающую список названий фильмов, 
     отсортированных по убыванию рейтинга.
     """
-    sorted_films = sorted(movies, key=lambda movies: movies.get('rating'), reverse = True)
+    sorted_films = sorted(movies, key=lambda movies: movies.get('rating'), reverse=True)
     movie_titles = [movie['title'] for movie in sorted_films]
     return movie_titles
 
 
-def top_n_by_rating(movies: list, n: int = 3) -> list[tuple]:
+def top_n_by_rating(movies: list[dict], n: int = 3) -> list[tuple]:
     """
     Функция top_n_by_rating(movies, n=3), 
     возвращающая список из n кортежей (title, rating) — топ по рейтингу.
@@ -222,31 +199,20 @@ def top_n_by_rating(movies: list, n: int = 3) -> list[tuple]:
 
 
 
-def count_by_genre(movies: list) -> list:
+def count_by_genre(movies: list[dict]) -> dict[str, int]:
     """
     Функция count_by_genre(movies), 
     возвращающает словарь {жанр: количество фильмов}
     """
-    counts = 0
-    result = []
-    for i in movies:
-        result = list(dict.fromkeys(result + list(movies[counts].get('genres',0))))
-        counts += 1
-
-    counts = 0
-    lists = []
-    for i in movies:
-        lists.append(movies[counts].get('genres'))
-        counts += 1
-
     final = {}
-    for i in result:
-        final[i] = sum(i in s for s in lists)
+    for movie in movies:
+        for genre in movie.get("genres", set()):
+            final[genre] = final.get(genre, 0) + 1
     return dict(sorted(final.items(), key=lambda x: -x[1]))
 
 
 
-def actor_filmography(movies:list) -> dict:
+def actor_filmography(movies:list[dict]) -> dict:
     """
     функция actor_filmography(movies), 
     возвращает словарь {актер: [список названий фильмов]}
@@ -261,55 +227,30 @@ def actor_filmography(movies:list) -> dict:
     return counts
 
 
-titles = []
-counts = 0
-for i in movies:
-    titles.append(movies[counts].get('title'))
-    counts += 1
-rating = []
-counts = 0
-for i in movies:
-    rating.append(movies[counts].get('rating'))
-    counts += 1
 avg_rate = average_rating(movies)
-title_rating = {title: rate for title, rate in zip(titles, rating) if rate > avg_rate}
-print(title_rating)
+title_rating = {m["title"]: m["rating"] for m in movies if m.get("rating", 0) > avg_rate}
 
-
-def all_genres(movies: list) -> set:
+def all_genres(movies: list[dict]) -> set:
     """
     функция all_genres(movies), 
     возвращающую множество всех уникальных жанров каталога
     """
     empty = set()
-    counts = 0
-    for i in movies:
-        empty = empty | movies[counts].get('genres')
-        counts += 1
+    for movie in movies:
+        empty = empty | movie.get('genres')
     return empty
 
 
-def common_actors(movie1: list[int], movie2: list[int]) -> set:
+
+def common_actors(movie1: dict, movie2: dict) -> set:
     """
     функция common_actors(movie1, movie2), 
     возвращающая множество актеров, снимавшихся в обоих фильмах.
     """
-    empty = set()
-    counts = 0
-    for i in movies:
-        if movies[counts].get('title') == movie1.get('title'):
-            empty = empty | set(movies[counts].get('actors'))
-        counts += 1
-
-    counts = 0
-    for i in movies:
-        if movies[counts].get('title') == movie2.get('title'):
-            empty = empty & set(movies[counts].get('actors'))
-        counts += 1
-    return empty
+    return set(movie1.get("actors", [])) & set(movie2.get("actors", []))
 
 
-def genres_only_in_one(movies_a: list[i], movies_b: list[i]) -> dict:
+def genres_only_in_one(movies_a: list[dict], movies_b: list[dict]) -> set[str]:
     """
     функция genres_only_in_one(movies_a, movies_b), 
     которая возвращает жанры, 
@@ -326,29 +267,22 @@ def genres_only_in_one(movies_a: list[i], movies_b: list[i]) -> dict:
     result = mv_a - mv_b
 
     return result
-result_goio = genres_only_in_one(movies[5:6], movies[:5])
-#print(result_goio)
 
-def iter_high_rated(movies: list, min_rating: float = 8.0) -> str:
+
+def iter_high_rated(movies: list, min_rating: float = 8.0) -> Iterator[dict]:
     """
     функция-генератор iter_high_rated(movies, min_rating=8.0), 
     которая через yield лениво отдает фильмы 
     с рейтингом не ниже min_rating.
     """
-    counts = 0
-    for i in movies:
-        if movies[counts].get('rating') > min_rating:
-            yield i
-        counts += 1
-
-for movie in iter_high_rated(movies):
-    print(format_report_line(movie))
-
-total = sum(m["duration_min"] for m in movies if m["rating"] > 7)
-print(total)
+    for movie in movies:
+        if movie.get('rating', 0.0) >= min_rating:
+            yield movie
 
 
-def build_report(movies):
+
+
+def build_report(movies: list[dict]) -> str:
     line = []
 
     avg_rating = average_rating(movies)
@@ -380,7 +314,35 @@ def build_report(movies):
     return "\n".join(line)
 
 if __name__ == "__main__":
+
+    # С помощью for и continue выведите на экран (print) 
+    # названия всех фильмов, которые НЕ относятся к жанру "comedy".
+    for movie in movies:
+        if 'comedy' not in movie.get('genres',[]):
+            print(movie.get('title',[]))
+        else:
+            continue
+
+    # С помощью while и break найдите первый по порядку в списке фильм 
+    # с рейтингом выше 9.0; если такого фильма нет, 
+    # цикл должен завершиться веткой else с сообщением "Шедевров не найдено".
+    counts = 0
+    while counts < len(movies):
+        if movies[counts].get('rating') > 9.0:
+            print(movies[counts].get('title'))
+            break
+        counts += 1
+    else:
+        print('Шедевров не найдено')
+
+    for movie in iter_high_rated(movies):
+        print(format_report_line(movie))
+    
+    total = sum(m["duration_min"] for m in movies if m["rating"] > 7)
+    print(total)
+
     print(build_report(movies))
+
 
 
 
