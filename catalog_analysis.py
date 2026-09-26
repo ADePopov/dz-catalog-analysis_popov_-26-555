@@ -189,7 +189,7 @@ def top_n_by_rating(movies: list[dict], n: int = 3) -> list[tuple]:
     Функция top_n_by_rating(movies, n=3), 
     возвращающая список из n кортежей (title, rating) — топ по рейтингу.
     """
-    sorted_films = sorted(movies, key=lambda movies: movies.get('rating'), reverse = True)
+    sorted_films = sorted(movies, key=lambda movies: movies.get('rating'), reverse=True)
     counts = 0
     result_list = []
     while counts < n:
@@ -226,9 +226,6 @@ def actor_filmography(movies:list[dict]) -> dict:
             counts[actor].append(title)
     return counts
 
-
-avg_rate = average_rating(movies)
-title_rating = {m["title"]: m["rating"] for m in movies if m.get("rating", 0) > avg_rate}
 
 def all_genres(movies: list[dict]) -> set:
     """
@@ -334,6 +331,10 @@ if __name__ == "__main__":
         counts += 1
     else:
         print('Шедевров не найдено')
+
+    avg_rate = average_rating(movies)
+    
+    title_rating = {m["title"]: m["rating"] for m in movies if m.get("rating", 0) > avg_rate}
 
     for movie in iter_high_rated(movies):
         print(format_report_line(movie))
