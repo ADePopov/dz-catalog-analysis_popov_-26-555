@@ -3,7 +3,8 @@ from collections.abc import Iterator
 
 movies = [
     {"title": "The Dune Chronicles", "year": 2021, "genres": {"sci-fi", "drama"},
-     "rating": 8.6, "duration_min": 155, "actors": ["T. Chalamet", "R. Ferguson", "O. Isaac"]},
+     "rating": 8.6, "duration_min": 155, 
+     "actors": ["T. Chalamet", "R. Ferguson", "O. Isaac"]},
     {"title": "Kitchen Stories", "year": 2019, "genres": {"comedy", "drama"},
      "rating": 7.1, "duration_min": 98, "actors": ["A. Novak", "M. Ferguson"]},
     {"title": "silent hours", "year": 2016, "genres": {"thriller", "drama"},
@@ -116,7 +117,8 @@ def decade_label(year: int) -> str:
 def count_long_movies(movies: list[dict], threshold: int = 120) -> int:
     """
     Функция count_long_movies(movies, threshold=120), 
-    которая через for с накопительной переменной считает количество фильмов длиннее threshold минут.
+    которая через for с накопительной переменной 
+    считает количество фильмов длиннее threshold минут.
     """
     counts_film = 0
     for movie in movies:
@@ -193,7 +195,8 @@ def top_n_by_rating(movies: list[dict], n: int = 3) -> list[tuple]:
     counts = 0
     result_list = []
     while counts < n:
-        result_list.append((sorted_films[counts].get('title'), sorted_films[counts].get('rating')))
+        result_list.append((sorted_films[counts].get('title'), 
+                            sorted_films[counts].get('rating')))
         counts += 1
     return result_list
 
@@ -333,8 +336,10 @@ if __name__ == "__main__":
         print('Шедевров не найдено')
 
     avg_rate = average_rating(movies)
-    
-    title_rating = {m["title"]: m["rating"] for m in movies if m.get("rating", 0) > avg_rate}
+
+    title_rating = {m["title"]: m["rating"] 
+                    for m in movies 
+                    if m.get("rating", 0) > avg_rate}
 
     for movie in iter_high_rated(movies):
         print(format_report_line(movie))
@@ -343,7 +348,6 @@ if __name__ == "__main__":
     print(total)
 
     print(build_report(movies))
-
 
 
 
